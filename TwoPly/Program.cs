@@ -1,7 +1,12 @@
+using TwoPly.Teams;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
+
+builder.Services.AddSingleton<ITeamService, TeamService>();
 
 // Add CORS so React can call the API
 builder.Services.AddCors(options =>
@@ -34,5 +39,8 @@ app.UseCors("AllowReact");
 // API endpoints
 app.MapGet("/api/health", () => new { status = "healthy and watching", timestamp = DateTime.UtcNow })
     .WithName("HealthCheck");
+
+
+app.MapControllers();
 
 app.Run();
