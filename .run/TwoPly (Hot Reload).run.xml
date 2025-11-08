@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TwoPly (Hot Reload)" type="CompoundRunConfigurationType">
+    <toRun name="Backend (Hot Reload)" type="RunDotNetWatch" />
+    <toRun name="Frontend (Hot Reload)" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>
