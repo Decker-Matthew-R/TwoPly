@@ -1,0 +1,6 @@
+@TwoPly_HostAddress = http://localhost:5279
+
+GET {{TwoPly_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
