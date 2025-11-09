@@ -1,0 +1,22 @@
+# .NET
+**/bin/
+**/obj/
+**/out/
+
+# Node
+**/node_modules/
+**/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Other
+**/.DS_Store
+**/Thumbs.db
