@@ -31,6 +31,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Serve static files from wwwroot
+app.UseDefaultFiles();  // Serves index.html as default
+app.UseStaticFiles();   // Enables static file serving
+
 app.UseHttpsRedirection();
 
 // Enable CORS
@@ -42,5 +46,7 @@ app.MapGet("/api/health", () => new { status = "healthy and watching", timestamp
 
 
 app.MapControllers();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();
