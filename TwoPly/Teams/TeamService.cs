@@ -1,24 +1,37 @@
+using Microsoft.EntityFrameworkCore;
+using TwoPly.Data;
+
 namespace TwoPly.Teams;
 
-public class TeamService : ITeamService
+public class TeamService(ApplicationDbContext context, ILogger<TeamService> logger) : ITeamService
 {
-    private readonly List<Team> _teamList = new ();
-    private int _nextId = 1;
-
-    public Team CreateTeam(string teamName)
+    public async Task<Team> CreateTeamAsync(string teamName)
     {
-        var team = new Team(teamName)
+        if (string.IsNullOrWhiteSpace(teamName))
         {
-            Id = _nextId++
-        };
-        
-        _teamList.Add(team);
+            logger.LogError("Team Service: Team name cannot be null or empty");
+            throw new ArgumentException("Team Service: Team name cannot be null or empty", nameof(teamName));
+        }
 
+        Team team = new Team(teamName);
+        
+        context.Teams.Add(team);
+        
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException exception)
+        {
+            logger.LogError("Team ServiceFailed to save team to databas");
+            throw new InvalidOperationException("Failed to save team to database", exception);
+        }
+        
         return team;
     }
 
-    public List<Team> GetAllTeams()
+    public async Task<List<Team>> GetAllTeamsAsync()
     {
-        return _teamList;
+        return await context.Teams.ToListAsync();
     }
 }
