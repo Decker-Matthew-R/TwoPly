@@ -20,7 +20,7 @@ public class TeamControllerTests
     }
 
     [Fact]
-    public void CreateTeam_WithValidName_ReturnsCreatedResult()
+    public async Task CreateTeam_WithValidName_ReturnsCreatedResult()  // 1. Added async Task
     {
         string mockTeamName = "Engineering";
         int mockTeamId = 1;
@@ -30,15 +30,15 @@ public class TeamControllerTests
         Team mockTeam = new Team(mockTeamName) { Id = mockTeamId, CreatedDate = mockCreationDate };
 
         _mockTeamService
-            .Setup(s => s.CreateTeam(request.TeamName))
-            .Returns(mockTeam);
+            .Setup(s => s.CreateTeamAsync(request.TeamName))
+            .ReturnsAsync(mockTeam);
 
-        IActionResult result = _controller.CreateTeam(request);
+        IActionResult result = await _controller.CreateTeam(request);
 
         ObjectResult? objectResult = result as ObjectResult;
         TeamResponse? returnedTeam = objectResult?.Value as TeamResponse;
 
-        _mockTeamService.Verify(service => service.CreateTeam(mockTeamName), Times.Once);
+        _mockTeamService.Verify(service => service.CreateTeamAsync(mockTeamName), Times.Once); 
         Assert.Equal(mockTeamName, returnedTeam?.TeamName);
         Assert.Equal(mockTeamId, returnedTeam?.Id);
         Assert.Equal(mockCreationDate, returnedTeam?.CreatedDate);
@@ -50,11 +50,11 @@ public class TeamControllerTests
     [InlineData("   ")]
     [InlineData("\t")]
     [InlineData("\n")]
-    public void CreateTeam_WithEmptyName_ReturnsBadRequest(string invalidTeamName)
+    public async Task CreateTeam_WithEmptyName_ReturnsBadRequest(string invalidTeamName)
     {
         CreateTeamRequest request = new CreateTeamRequest { TeamName = invalidTeamName };
 
-        IActionResult result = _controller.CreateTeam(request);
+        IActionResult result = await _controller.CreateTeam(request);
 
         _mockLogger.Verify(
             logger => logger.Log(
@@ -74,12 +74,12 @@ public class TeamControllerTests
     [Theory]
     [InlineData("This team name is waaaaaaaaaay tooooooooo looooooooong")]
     [InlineData("ThisTeamNameIsWaaaaaaaaaayToooooooooLooooooooong")]
-    public void CreateTeam_WithNameTooLong_ReturnsBadRequest(string longTeamName)
+    public async Task CreateTeam_WithNameTooLong_ReturnsBadRequest(string longTeamName)
     {
         int nameLength = longTeamName.Length;
         CreateTeamRequest request = new CreateTeamRequest { TeamName = longTeamName };
 
-        IActionResult result = _controller.CreateTeam(request);
+        IActionResult result = await _controller.CreateTeam(request);
 
         _mockLogger.Verify(
             logger => logger.Log(
@@ -98,7 +98,7 @@ public class TeamControllerTests
     }
 
     [Fact]
-    public void CreateTeam_WhenServiceThrowsException_ReturnsServerError()
+    public async Task CreateTeam_WhenServiceThrowsException_ReturnsServerError()
     {
         string teamName = "Engineering";
 
@@ -106,11 +106,11 @@ public class TeamControllerTests
         Exception expectedException = new Exception("Database connection failed");
 
         _mockTeamService
-            .Setup(s => s.CreateTeam(It.IsAny<string>()))
+            .Setup(s => s.CreateTeamAsync(It.IsAny<string>()))
             .Throws(expectedException);
 
 
-        IActionResult result = _controller.CreateTeam(request);
+        IActionResult result = await _controller.CreateTeam(request);
 
         ObjectResult? objectResult = result as ObjectResult;
         Assert.NotNull(objectResult);
@@ -119,7 +119,7 @@ public class TeamControllerTests
         string json = JsonSerializer.Serialize(objectResult.Value);
         Assert.Contains("An error occurred while creating the team", json);
 
-        _mockTeamService.Verify(service => service.CreateTeam(teamName), Times.Once);
+        _mockTeamService.Verify(service => service.CreateTeamAsync(teamName), Times.Once);
         _mockLogger.Verify(
             logger => logger.Log(
                 LogLevel.Error,
@@ -131,7 +131,7 @@ public class TeamControllerTests
     }
 
     [Fact]
-    public void GetAllTeams_ReturnsAllTeams()
+    public async Task GetAllTeams_ReturnsAllTeams()
     {
         DateTime createdDate = DateTime.UtcNow;
 
@@ -143,15 +143,15 @@ public class TeamControllerTests
         mockTeams.Add(team2);
 
         _mockTeamService
-            .Setup(service => service.GetAllTeams())
-            .Returns(mockTeams);
+            .Setup(service => service.GetAllTeamsAsync())
+            .ReturnsAsync(mockTeams);
 
-        IActionResult result = _controller.GetAllTeams();
+        IActionResult result = await  _controller.GetAllTeams();
 
         ObjectResult? objectResult = result as ObjectResult;
         List<TeamResponse>? returnedTeams = objectResult?.Value as List<TeamResponse>;
 
-        _mockTeamService.Verify(service => service.GetAllTeams(), Times.Once);
+        _mockTeamService.Verify(service => service.GetAllTeamsAsync(), Times.Once);
         Assert.Equal(200, objectResult?.StatusCode);
         
         Assert.Equal(2, returnedTeams?.Count);
@@ -166,15 +166,15 @@ public class TeamControllerTests
     }
 
     [Fact]
-    public void GetAllTeams_WhenServiceThrowsException_ReturnsServerError()
+    public async Task GetAllTeams_WhenServiceThrowsException_ReturnsServerError()
     {
         Exception expectedException = new Exception("Database connection failed");
 
         _mockTeamService
-            .Setup(s => s.GetAllTeams())
+            .Setup(s => s.GetAllTeamsAsync())
             .Throws(expectedException);
 
-        IActionResult result = _controller.GetAllTeams();
+        IActionResult result = await _controller.GetAllTeams();
 
         ObjectResult? objectResult = result as ObjectResult;
         Assert.NotNull(objectResult);
@@ -183,7 +183,7 @@ public class TeamControllerTests
         string json = JsonSerializer.Serialize(objectResult.Value);
         Assert.Contains("An error occurred returning all teams", json);
 
-        _mockTeamService.Verify(service => service.GetAllTeams(), Times.Once);
+        _mockTeamService.Verify(service => service.GetAllTeamsAsync(), Times.Once);
         _mockLogger.Verify(
             logger => logger.Log(
                 LogLevel.Error,

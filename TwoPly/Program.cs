@@ -12,7 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
-builder.Services.AddSingleton<ITeamService, TeamService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 // Add CORS so React can call the API
 builder.Services.AddCors(options =>

@@ -7,7 +7,7 @@ namespace TwoPly.Teams;
 public class TeamController(ITeamService iTeamService, ILogger<TeamController> logger) : ControllerBase
 {
     [HttpPost]
-    public IActionResult CreateTeam([FromBody] CreateTeamRequest createTeamRequest)
+    public async Task<IActionResult> CreateTeam([FromBody] CreateTeamRequest createTeamRequest)
     {
         try
         {
@@ -17,7 +17,7 @@ public class TeamController(ITeamService iTeamService, ILogger<TeamController> l
                 return BadRequest(validationError);
             }
 
-            Team createdTeam = iTeamService.CreateTeam(createTeamRequest.TeamName);
+            Team createdTeam = await iTeamService.CreateTeamAsync(createTeamRequest.TeamName);
 
             TeamResponse response = MapToResponse(createdTeam);
 
@@ -31,11 +31,11 @@ public class TeamController(ITeamService iTeamService, ILogger<TeamController> l
     }
 
     [HttpGet]
-    public IActionResult GetAllTeams()
+    public async Task<IActionResult> GetAllTeams()
     {
         try
         {
-            List<Team> teamList = iTeamService.GetAllTeams();
+            List<Team> teamList = await iTeamService.GetAllTeamsAsync();
 
             List<TeamResponse> response = teamList.ConvertAll(MapToResponse);
 

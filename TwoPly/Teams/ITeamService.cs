@@ -2,6 +2,6 @@ namespace TwoPly.Teams;
 
 public interface ITeamService
 {
-    Team CreateTeam(string teamName);
-    List<Team> GetAllTeams();
+    Task<Team> CreateTeamAsync(string teamName);
+    Task<List<Team>> GetAllTeamsAsync();
 }
